@@ -11,10 +11,7 @@
     "compile": "hardhat compile",
     "deploy:evm": "hardhat run scripts/deploy-evm.js --network devnet",
     "deploy:move": "hardhat run scripts/deploy-move.js --network devnet",
-    "deploy:all": "npm run deploy:evm && npm run deploy:move",
-    "test:move": "cd contracts/move && aptos move test",
-    "test:evm": "hardhat test",
-    "faucet": "node scripts/faucet.js"
+    "deploy:all": "npm run deploy:evm && npm run deploy:move"
   },
   "keywords": [],
   "author": "",
@@ -27,8 +24,5 @@
     "@nomicfoundation/hardhat-toolbox": "^6.0.0",
     "dotenv": "^16.5.0",
     "hardhat": "^2.25.0"
-  },
-  "dependencies": {
-    "aptos": "^1.21.0"
   }
 }

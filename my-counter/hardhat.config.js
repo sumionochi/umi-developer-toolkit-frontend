@@ -7,11 +7,8 @@ require("@moved/hardhat-plugin");            // Umi Move support
  */
 module.exports = {
   solidity: "0.8.28",
-  defaultNetwork: "hardhat", // used Hardhat for local testing
+  defaultNetwork: "devnet",
   networks: {
-    hardhat: {
-      // you can tinker with forking or accounts here if you like
-    },
     devnet: {
       url: "https://devnet.moved.network",    // Umi Devnet RPC
       accounts: [process.env.PRIVATE_KEY],     // from .env
