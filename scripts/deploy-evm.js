@@ -29,7 +29,7 @@ function serialize(bytecode) {
 
 async function main() {
   // 1. Compile & serialize
-  const Factory = await ethers.getContractFactory("Counter");
+  const Factory = await ethers.getContractFactory("Counterevm");
   const code = serialize(Factory.bytecode);
   console.log("Serialized CODE:", code);
 

@@ -3,7 +3,7 @@ const { AccountAddress, EntryFunction, FixedBytes, parseTypeTag } = require('@ap
 const { TransactionPayloadEntryFunction, TypeTagSigner } = require('@aptos-labs/ts-sdk');
 
 async function main() {
-  const contractName = 'counter';
+  const contractName = 'Counter';
   const [deployer] = await ethers.getSigners();
   const moduleAddress = deployer.address.replace('0x', '0x000000000000000000000000');
 
@@ -28,7 +28,8 @@ async function main() {
     to: deployer.address,
     data: payload.toString(),
   };
-  await deployer.sendTransaction(request);
+  const tx = await deployer.sendTransaction(request);
+  console.log('Initialize tx hash:', tx.hash);
   console.log('Initialize transaction sent');
 }
 

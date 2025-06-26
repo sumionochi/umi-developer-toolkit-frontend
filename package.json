@@ -29,6 +29,8 @@
     "hardhat": "^2.25.0"
   },
   "dependencies": {
-    "aptos": "^1.21.0"
+    "@mysten/bcs": "^1.6.3",
+    "aptos": "^1.21.0",
+    "viem": "^2.31.4"
   }
 }

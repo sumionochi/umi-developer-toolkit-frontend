@@ -7,7 +7,7 @@ describe("Counter (EVM)", function () {
 
   before(async function () {
     // grab the factory
-    const Counter = await ethers.getContractFactory("Counter");
+    const Counter = await ethers.getContractFactory("Counterevm");
     // deploy it
     counter = await Counter.deploy();
     // wait until it’s mined
