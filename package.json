@@ -1,10 +1,10 @@
 {
-  "name": "umi-developer-toolkit",
-  "version": "1.0.0",
+  "name": "create-umi-app",
+  "version": "1.0.1",
   "bin": {
     "create-umi-app": "bin/create-umi-app.js"
   },
-  "description": "",
+  "description": "Instant Fullstack Scaffold where CLI generates fresh projects with Dual-VM Umi dApp support (Move + EVM) together with built-in MoveAI & SolidityAI browser IDE for opening the project in a browser, edit code, compile, and deploy",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -16,9 +16,17 @@
     "test:evm": "hardhat test",
     "faucet": "node scripts/faucet.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "umi",
+    "move",
+    "solidity",
+    "cli",
+    "scaffold",
+    "ide",
+    "instant"
+  ],
+  "author": "Aadtiya Srivastava <aadtiya.srivastava.connect@gmail.com>",
+  "license": "MIT",
   "type": "commonjs",
   "devDependencies": {
     "@aptos-labs/ts-sdk": "^2.0.1",
@@ -29,6 +37,7 @@
     "hardhat": "^2.25.0"
   },
   "dependencies": {
+    "fs-extra": "^11.2.0",
     "@mysten/bcs": "^1.6.3",
     "aptos": "^1.21.0",
     "viem": "^2.31.4"
