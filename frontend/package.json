@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "@aptos-labs/ts-sdk": "^2.0.1",
+    "@benfen/bcs": "^0.1.0",
     "@mysten/bcs": "^1.6.3",
+    "ethers": "^6.14.4",
     "next": "15.3.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

@@ -8,7 +8,7 @@ const {
 } = require('@aptos-labs/ts-sdk');
 
 async function main() {
-  const rawAddr = process.argv[2] || process.env.DEPLOYER_ADDR;
+  const rawAddr = process.argv[2] || process.env.PUBLIC_KEY_DEPLOYER_ADDR;
   if (!rawAddr) {
     console.error('Usage: npm run faucet <YOUR_EOA_ADDRESS>');
     process.exit(1);

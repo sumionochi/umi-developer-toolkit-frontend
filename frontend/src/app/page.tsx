@@ -1,9 +1,12 @@
-import Counter from '@/components/Counter';
+// src/app/page.tsx
+import MoveCounter from '@/components/MoveCounter';
+import EVMCounter  from '@/components/EVMCounter';
 
 export default function Home() {
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen">
-      <Counter />
+    <main className="grid md:grid-cols-2 gap-10 p-10">
+      <MoveCounter />
+      <EVMCounter />
     </main>
   );
 }
