@@ -32,8 +32,14 @@ for (const a of argv) {
 }
 
 /* ─────────────── interactive prompt if name missing ─────────────────────── */
-(async () => {                            // NEW – wrap main flow in async IIFE
+(async () => {                      
+  const isTTY = process.stdin.isTTY && process.stdout.isTTY;      // NEW – wrap main flow in async IIFE
   if (!project) {
+    if (!isTTY) {
+      console.error('\n❌  Please pass a project name (non-interactive mode).\n' +
+                    '    Example: npx create-umi-app my-dapp');
+      process.exit(1);
+    }
     project = await ask('\n🛠  Enter the project name: ');
     if (!project) {
       console.error('❌  A project name is required.');
