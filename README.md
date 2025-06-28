@@ -49,19 +49,6 @@ npm run compile && npm run deploy:all
 
 ## 🏗️ Quick Start
 
-### 0. Configure Secrets
-
-After scaffolding (step 1) but **before compile/deploy**, create a `.env` file at the root:
-
-```dotenv
-# 👉 Devnet burner wallet recommended
-PRIVATE_KEY="0xabc123…"
-PUBLIC_KEY_DEPLOYER_ADDR="0xYourEOA20Byte"
-```
-
-- `PRIVATE_KEY` – used by Hardhat scripts (`hardhat.config.js`)
-- `PUBLIC_KEY_DEPLOYER_ADDR` – used by faucet & explorer links
-
 ### 1. Scaffold a Fresh Project
 
 ```bash
@@ -75,6 +62,19 @@ CLI does:
 - Drops Hardhat config for `https://devnet.moved.network`
 - Installs all deps: Hardhat, @moved plugin, ts-sdk, Viem, Next, Tailwind, etc.
 - Prints next steps
+
+### 1.5 Configure Secrets
+
+After scaffolding (step 1) but **before compile/deploy**, create a `.env` file at the root:
+
+```dotenv
+# 👉 Devnet burner wallet recommended
+PRIVATE_KEY="0xabc123…"
+PUBLIC_KEY_DEPLOYER_ADDR="0xYourEOA20Byte"
+```
+
+- `PRIVATE_KEY` – used by Hardhat scripts (`hardhat.config.js`)
+- `PUBLIC_KEY_DEPLOYER_ADDR` – used by faucet & explorer links
 
 ### 2. Compile Both VMs
 

@@ -9,7 +9,14 @@ import {
   type EIP1193Provider,
 } from "viem";
 import { publicActionsL2, walletActionsL2 } from "viem/op-stack";
-import { abi } from "../../../artifacts/contractsevm/evm/Counterevm.sol/Counterevm.json";
+import CounterEvm from "../../../artifacts/contractsevm/evm/Counterevm.sol/Counterevm.json";
+{
+  type: "json";
+}
+
+import type { InterfaceAbi } from "ethers";
+export const counterAbi = CounterEvm.abi as InterfaceAbi;
+export const counterBytecode = CounterEvm.bytecode as `0x${string}`;
 
 declare global {
   interface Window {
@@ -68,7 +75,12 @@ export const getEvmFunction = async (
   name: "count" | "increment",
   contract: `0x${string}`
 ) => {
-  const counter = new ethers.Contract(contract, abi);
+  /* now TS is happy */
+  const counter = new ethers.Contract(contract, counterAbi);
+
   const tx = await counter.getFunction(name).populateTransaction();
-  return { to: tx.to as `0x${string}`, data: serialize(tx.data as string) };
+  return {
+    to: tx.to as `0x${string}`,
+    data: serialize(tx.data as string),
+  };
 };

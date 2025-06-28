@@ -1,4 +1,5 @@
 // src/app/page.tsx
+"use client";
 import MoveCounter from '@/components/MoveCounter';
 import EVMCounter  from '@/components/EVMCounter';
 import { Button } from "@/components/ui/button"
@@ -18,26 +19,27 @@ import {
   } from "lucide-react"
 import Link from "next/link"
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useChainId, useSwitchChain, useAccount } from "wagmi";
 import { queryClient } from "@/components/Provider";
 import { WalletControls } from '@/components/WalletControl';
+import { useAccount } from "wagmi";
+import { umiDevnet } from '@/lib/chains';
+import { useRouter } from 'next/navigation';
+import Header from '@/components/Header';
 
 export default function Home() {
+  const Router = useRouter();
+  /* ── wallet status ───────────────────────── */
+  const { isConnected, chain } = useAccount();
+  const onUmi = isConnected && chain?.id === umiDevnet.id;
+
+  const handleRoutingToCounters = () => {
+    Router.push('/counters');
+  }
+
   return (
     <div className="min-h-screen bg-white dark:bg-black">
       {/* Header */}
-      <header className="flex items-center justify-between p-6">
-        <div className="flex items-center space-x-2">
-          <img src="./logo.png" alt="umi-logo" width={25} height={25} />
-          <span className="text-primary dark:text-white text-xl font-semibold tracking-tight">
-            Umi
-          </span>
-        </div>
-        <div className="flex items-center space-x-4">
-          <ThemeToggle />
-          <WalletControls />
-        </div>
-      </header>
+      <Header/>
 
       {/* Hero */}
       <main className="flex flex-col items-center justify-center px-6 py-20">
@@ -61,14 +63,35 @@ export default function Home() {
           </div>
 
           <h1 className="text-primary dark:text-white text-2xl font-semibold mb-4 tracking-tight">
-            Watch this page update as you edit src/page.tsx.
+            Watch this page update as you edit src/page.tsx
           </h1>
 
-          <p className="text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto leading-relaxed font-normal">
-            Connect your wallet to unlock a not-so-secret page where you can
-            <br />
-            start interacting with smart contracts right away :
-          </p>
+          {onUmi ? (
+            <div className="flex justify-center gap-4 mt-8">
+              <div className="relative group">              
+                {/* Moving beam effect */}
+                <div className="absolute -inset-1 rounded-lg overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-600/30 to-transparent animate-beam"></div>
+                </div>
+
+                {/* Button */}
+                <Button
+                  onClick={handleRoutingToCounters}
+                  size="lg"
+                  variant="outline"
+                  className="relative cursor-pointer border shadow-md"
+                >
+                  Counters in 🦀 Move & ⚙️ EVM
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <p className="text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto leading-relaxed font-normal">
+              Connect your wallet to unlock Dual-VM contracts demo page where you can
+              <br />
+              start interacting with smart contracts right away :
+            </p>
+          )}
         </div>
 
         {/* Feature Cards */}
