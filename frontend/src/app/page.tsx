@@ -17,6 +17,10 @@ import {
     Compass,
   } from "lucide-react"
 import Link from "next/link"
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useChainId, useSwitchChain, useAccount } from "wagmi";
+import { queryClient } from "@/components/Provider";
+import { WalletControls } from '@/components/WalletControl';
 
 export default function Home() {
   return (
@@ -31,7 +35,7 @@ export default function Home() {
         </div>
         <div className="flex items-center space-x-4">
           <ThemeToggle />
-          
+          <WalletControls />
         </div>
       </header>
 
