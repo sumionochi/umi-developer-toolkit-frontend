@@ -5,7 +5,8 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/ui/theme-provider"
 import { Providers } from "@/components/Provider";
 import '@rainbow-me/rainbowkit/styles.css';
-
+import { Suspense } from 'react';
+import LoadingComponent from '@/components/LoadingComponent';
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
@@ -26,7 +27,11 @@ export default function RootLayout({
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body className={`${inter.className} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          <Providers>{children}</Providers>
+          <Providers>
+            <Suspense fallback={<LoadingComponent />}>
+              {children}
+            </Suspense>
+          </Providers>
         </ThemeProvider>
       </body>
     </html>
