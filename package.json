@@ -14,7 +14,16 @@
     "deploy:all": "npm run deploy:evm && npm run deploy:move",
     "test:move": "cd contracts/move && aptos move test",
     "test:evm": "hardhat test",
-    "faucet": "node scripts/faucet.js"
+    "faucet": "node scripts/faucet.js",
+
+    "chain:evm": "hardhat node --hostname 0.0.0.0 --port 8545",
+    "chain:move": "aptos node run-localnet --test-dir aptos_data",
+    "chain:local": "concurrently \"npm:chain:evm\" \"npm:chain:move\"",
+
+    "deploy:evm:local": "hardhat run scripts/deploy-evm-local.js --network localhost",
+    "deploy:move:local": "aptos move publish --package-dir contracts/move --dev",
+
+    "dev:local": "npm run chain:local & npm run deploy:evm:local & npm run deploy:move:local"
   },
   "keywords": [
     "umi",
@@ -33,13 +42,14 @@
     "@benfen/bcs": "^0.1.0",
     "@moved/hardhat-plugin": "^0.1.1",
     "@nomicfoundation/hardhat-toolbox": "^6.0.0",
+    "concurrently": "^9.2.0",
     "dotenv": "^16.5.0",
     "hardhat": "^2.25.0"
   },
   "dependencies": {
-    "fs-extra": "^11.2.0",
     "@mysten/bcs": "^1.6.3",
     "aptos": "^1.21.0",
+    "fs-extra": "^11.2.0",
     "viem": "^2.31.4"
   }
 }
