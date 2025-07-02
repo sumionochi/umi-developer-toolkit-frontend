@@ -10,6 +10,7 @@ import {
   createWalletClient,
   custom,
   defineChain,
+  type Chain,
 } from "viem";
 import { publicActionsL2, walletActionsL2 } from "viem/op-stack";
 
@@ -45,21 +46,19 @@ export const getMoveAccount = async () => {
 };
 
 /* ───────────────────────────── viem clients ── */
-export const publicClient = () => {
-  console.log("[cfg] new publicClient()");
+export function publicClient(chain: Chain) {
   return createPublicClient({
-    chain: devnet,
+    chain,
     transport: custom(window.ethereum!),
   }).extend(publicActionsL2());
-};
+}
 
-export const walletClient = () => {
-  console.log("[cfg] new walletClient()");
+export function walletClient(chain: Chain) {
   return createWalletClient({
-    chain: devnet,
+    chain,
     transport: custom(window.ethereum!),
   }).extend(walletActionsL2());
-};
+}
 
 /* ───────────────────────────── payload builder ── */
 export const counterPayload = async (method: string) => {
