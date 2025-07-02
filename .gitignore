@@ -1,2 +1,4 @@
 node_modules/
 .env
+aptos_data/     
+aptos_data
