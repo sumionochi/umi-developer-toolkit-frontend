@@ -10,7 +10,7 @@ export const umiDevnet = defineChain({
   name: "Umi Devnet",
   network: "umi-devnet",
   nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-  rpcUrls: { default: { http: ["https://devnet.moved.network"] } },
+  rpcUrls: { default: { http: ["https://devnet.uminetwork.com"] } },
   blockExplorers: {
     default: {
       name: "Umi Explorer",
@@ -41,7 +41,7 @@ export const localMove = defineChain({
 export const wagmiConfig = createConfig({
   chains: [umiDevnet, localEvm] as const,
   transports: {
-    [umiDevnet.id]: http("https://devnet.moved.network"),
+    [umiDevnet.id]: http("https://devnet.uminetwork.com"),
     [localEvm.id]: http("http://localhost:8545"),
   },
   connectors: [injected()],

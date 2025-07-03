@@ -20,12 +20,14 @@ import {
   getAccount, getEvmFunction, publicClient, walletClient,
 } from "@/lib/sol-config";
 import { hexToBytes } from 'viem';
+import localJson from "@/../../cache-evm/local-counter.json" assert { type: "json" };
+
 
 export default function EVMCounter() {
   const chainId = useChainId();
   const chain = chainId === localEvm.id ? localEvm : umiDevnet;
 
-  const [addr, setAddr] = useState("");
+  const [addr, setAddr] = useState(localJson.address || "");
   const [value, setValue] = useState<number>();
   const [connected, setConnected] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -85,15 +87,31 @@ export default function EVMCounter() {
     try {
       setBusy(true);
       setError("");
-      const { to, data } = await getEvmFunction("increment", addr as `0x${string}`, chain);
-      console.log("[EVMCounter][increment] calldata to:", to, "data:", data);
-
-      const acct = await getAccount();
-      console.log("[EVMCounter][increment] wallet account:", acct);
-
-      const hash = await walletClient(chain).sendTransaction({ account: acct, to, data });
+  
+      // build calldata
+      const { to, data } = await getEvmFunction(
+        "increment",
+        addr as `0x${string}`,
+        chain,
+      );
+  
+      const acct = await getAccount();          // 0x… address
+  
+      // ✨ fetch the on-chain nonce
+      const currentNonce = await publicClient(chain).getTransactionCount({
+        address: acct,
+      });
+      console.log("[EVMCounter][increment] using nonce:", currentNonce);
+  
+      // send tx with explicit nonce
+      const hash = await walletClient(chain).sendTransaction({
+        account: acct,
+        to,
+        data,
+        nonce: currentNonce,
+      });
       console.log("[EVMCounter][increment] tx hash:", hash);
-
+  
       await publicClient(chain).waitForTransactionReceipt({ hash });
       await refresh();
     } catch (err) {
@@ -102,7 +120,7 @@ export default function EVMCounter() {
     } finally {
       setBusy(false);
     }
-  };
+  };  
 
   const copyAddress = () => {
     console.log("[EVMCounter] copy address:", addr);

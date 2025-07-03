@@ -13,7 +13,7 @@ module.exports = {
       // you can tinker with forking or accounts here if you like
     },
     devnet: {
-      url: "https://devnet.moved.network",    // Umi Devnet RPC
+      url: "https://devnet.uminetwork.com",    // Umi Devnet RPC
       accounts: [process.env.PRIVATE_KEY],     // from .env
     },
   },

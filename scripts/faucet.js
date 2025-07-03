@@ -22,8 +22,8 @@ async function main() {
   // configure Umi Devnet endpoints
   const config = new AptosConfig({
     network:   Network.DEVNET,
-    nodeUrl:   'https://devnet.moved.network',
-    faucetUrl: 'https://devnet.moved.network/faucet'
+    nodeUrl:   'https://devnet.uminetwork.com',
+    faucetUrl: 'https://devnet.uminetwork.com/faucet',
   });
   const aptos = new Aptos(config);
 

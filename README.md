@@ -59,7 +59,7 @@ cd my-counter
 CLI does:
 
 - Copies Move + Solidity templates
-- Drops Hardhat config for `https://devnet.moved.network`
+- Drops Hardhat config for `https://devnet.uminetwork.com`
 - Installs all deps: Hardhat, @moved plugin, ts-sdk, Viem, Next, Tailwind, etc.
 - Prints next steps
 

@@ -26,7 +26,7 @@ export const devnet = defineChain({
   sourceId: 42069,
   name: "Umi",
   nativeCurrency: { decimals: 18, name: "Ether", symbol: "ETH" },
-  rpcUrls: { default: { http: ["https://devnet.moved.network"] } },
+  rpcUrls: { default: { http: ["https://devnet.uminetwork.com"] } },
 });
 
 /* ───────────────────────────── helpers ── */
