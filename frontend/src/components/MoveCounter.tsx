@@ -1,3 +1,4 @@
+//MoveCounter.tsx
 "use client"
 
 import { useState } from "react"
@@ -7,11 +8,15 @@ import { Badge } from "@/components/ui/badge"
 import { Loader2, Wallet, Plus, CheckCircle, AlertCircle } from "lucide-react"
 import { counterPayload, extractOutput, getAccount, publicClient, walletClient } from "@/lib/config"
 import { bcs } from "@mysten/bcs"
+import { useChainId } from "wagmi"
+import { umiDevnet, localMove } from "@/lib/customConfig";
 
 /* BCS layout for struct Counter { value: u64 } */
 const MoveCounterBCS = bcs.struct("Counter", { value: bcs.u64() })
 
 export default function MoveCounter() {
+  const chainId = useChainId()
+  const chain   = chainId === localMove.id ? localMove : umiDevnet
   /* ───────── local UI state ───────── */
   const [connected, setConnected] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -24,7 +29,7 @@ export default function MoveCounter() {
     try {
       setError("")
       const acct = await getAccount()
-      const { data } = await publicClient().call({
+      const { data } = await publicClient(chain).call({
         to: acct as `0x${string}`,
         data: await counterPayload("get"),
       })
@@ -57,12 +62,12 @@ export default function MoveCounter() {
     try {
       setError("")
       const acct = await getAccount()
-      const hash = await walletClient().sendTransaction({
+      const hash = await walletClient(chain).sendTransaction({
         account: acct as `0x${string}`,
         to: acct as `0x${string}`,
         data: await counterPayload("increment"),
       })
-      await publicClient().waitForTransactionReceipt({ hash })
+      await publicClient(chain).waitForTransactionReceipt({ hash })
       await refresh()
     } catch (err) {
       setError("Failed to increment counter")
@@ -193,3 +198,4 @@ export default function MoveCounter() {
     </div>
   )
 }
+
