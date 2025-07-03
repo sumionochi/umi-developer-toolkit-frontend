@@ -22,15 +22,18 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { queryClient } from "@/components/Provider";
 import { WalletControls } from '@/components/WalletControl';
 import { useAccount } from "wagmi";
-import { umiDevnet } from '@/lib/chains';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
+import { umiDevnet, localEvm } from "@/lib/customConfig";
 
 export default function Home() {
   const Router = useRouter();
-  /* ── wallet status ───────────────────────── */
   const { isConnected, chain } = useAccount();
-  const onUmi = isConnected && chain?.id === umiDevnet.id;
+
+  // both Devnet and Local are OK
+  const onSupported =
+    isConnected &&
+    (chain?.id === umiDevnet.id || chain?.id === localEvm.id);
 
   const handleRoutingToCounters = () => {
     Router.push('/counters');
@@ -66,7 +69,7 @@ export default function Home() {
             Watch this page update as you edit src/page.tsx
           </h1>
 
-          {onUmi ? (
+          {onSupported ? (
             <div className="flex justify-center gap-4 mt-8">
               <div className="relative group">              
                 {/* Moving beam effect */}

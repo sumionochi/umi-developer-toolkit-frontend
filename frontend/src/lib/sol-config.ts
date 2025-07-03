@@ -1,60 +1,21 @@
-// lib/sol-config.ts
+// src/lib/sol-config.ts
+import CounterJson from "../../../artifacts/contractsevm/evm/Counterevm.sol/Counterevm.json" assert { type: "json" };
 import { BCS, getRustConfig } from "@benfen/bcs";
-import { ethers } from "ethers";
 import {
   createPublicClient,
   createWalletClient,
   custom,
   defineChain,
-  type EIP1193Provider,
+  type Chain,
+  encodeFunctionData,
 } from "viem";
 import { publicActionsL2, walletActionsL2 } from "viem/op-stack";
-import CounterEvm from "../../../artifacts/contractsevm/evm/Counterevm.sol/Counterevm.json";
-{
-  type: "json";
-}
+import { umiDevnet, localEvm } from "@/lib/customConfig";
 
-import type { InterfaceAbi } from "ethers";
-export const counterAbi = CounterEvm.abi as InterfaceAbi;
-export const counterBytecode = CounterEvm.bytecode as `0x${string}`;
+// ─── 2. ABI + BCS Serializer ────────────────────────────────────────
+export const counterAbi = CounterJson.abi as readonly any[];
+export const counterBytecode = CounterJson.bytecode as `0x${string}`;
 
-declare global {
-  interface Window {
-    ethereum?: { request: (a: { method: string }) => Promise<any> };
-  }
-}
-
-/* ---------------------- chain ---------------------- */
-export const devnet = defineChain({
-  id: 42069,
-  sourceId: 42069,
-  name: "Umi",
-  nativeCurrency: { decimals: 18, name: "Ether", symbol: "ETH" },
-  rpcUrls: { default: { http: ["https://devnet.uminetwork.com"] } },
-});
-
-/* ---------------------- helpers ---------------------- */
-export const getAccount = async () => {
-  const [acct] = await window.ethereum!.request({
-    method: "eth_requestAccounts",
-  });
-  return acct as `0x${string}`;
-};
-
-/* ---------------------- viem clients ---------------------- */
-export const publicClient = () =>
-  createPublicClient({
-    chain: devnet,
-    transport: custom(window.ethereum!),
-  }).extend(publicActionsL2());
-
-export const walletClient = () =>
-  createWalletClient({
-    chain: devnet,
-    transport: custom(window.ethereum!),
-  }).extend(walletActionsL2());
-
-/* ---------------------- BCS wrapper ---------------------- */
 const bcs = new BCS(getRustConfig());
 bcs.registerEnumType("SerializableTransactionData", {
   EoaBaseTokenTransfer: "",
@@ -64,23 +25,51 @@ bcs.registerEnumType("SerializableTransactionData", {
   EvmContract: "Vec<u8>",
 });
 
-const serialize = (data: string): `0x${string}` => {
-  const bytes = Uint8Array.from(Buffer.from(data.replace("0x", ""), "hex"));
-  const blob = bcs.ser("SerializableTransactionData", { EvmContract: bytes });
-  return `0x${blob.toString("hex")}`;
-};
+/** Wrap raw EVM calldata in Move’s enum for Umi */
+function wrapForMove(data: `0x${string}`): `0x${string}` {
+  const code = Uint8Array.from(Buffer.from(data.slice(2), "hex"));
+  const wrapped = bcs.ser("SerializableTransactionData", { EvmContract: code });
+  return `0x${wrapped.toString("hex")}`;
+}
 
-/* ---------------------- main util ---------------------- */
-export const getEvmFunction = async (
-  name: "count" | "increment",
-  contract: `0x${string}`
-) => {
-  /* now TS is happy */
-  const counter = new ethers.Contract(contract, counterAbi);
+// ─── 3. Wallet Helpers ─────────────────────────────────────────────
+/** Prompt the injected wallet (Metamask/Rabby) and return the first address */
+export async function getAccount(): Promise<`0x${string}`> {
+  const [acct] = (await window.ethereum!.request({
+    method: "eth_requestAccounts",
+  })) as string[];
+  return acct as `0x${string}`;
+}
 
-  const tx = await counter.getFunction(name).populateTransaction();
-  return {
-    to: tx.to as `0x${string}`,
-    data: serialize(tx.data as string),
-  };
-};
+export async function getEvmFunction(
+  method: "count" | "increment",
+  contract: `0x${string}`,
+  chain: Chain
+): Promise<{ to: `0x${string}`; data: `0x${string}` }> {
+  // 1. Use Viem to ABI-encode the function selector
+  const rawData = encodeFunctionData({
+    abi: counterAbi,
+    functionName: method,
+    args: [], // no inputs
+  });
+
+  // 2. On Umi Devnet wrap in BCS; otherwise use raw EVM calldata
+  const data = chain.id === umiDevnet.id ? wrapForMove(rawData) : rawData;
+
+  return { to: contract, data };
+}
+
+// ─── 4. RPC Clients ────────────────────────────────────────────────
+export function publicClient(chain: Chain) {
+  return createPublicClient({
+    chain,
+    transport: custom(window.ethereum!),
+  }).extend(publicActionsL2());
+}
+
+export function walletClient(chain: Chain) {
+  return createWalletClient({
+    chain,
+    transport: custom(window.ethereum!),
+  }).extend(walletActionsL2());
+}

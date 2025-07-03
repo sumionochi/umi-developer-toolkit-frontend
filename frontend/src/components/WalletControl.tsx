@@ -1,36 +1,36 @@
 "use client";
+import React, { useEffect } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import {
-  useAccount,
-  useDisconnect,
-  useSwitchChain,
-} from "wagmi";
-import { umiDevnet } from "@/lib/chains"; 
-import React from "react";
+import { useAccount, useDisconnect, useSwitchChain } from "wagmi";
+import { umiDevnet, localEvm } from "@/lib/customConfig";
 
 export function WalletControls() {
-  const { address, chain, isConnected } = useAccount();   
-  const { disconnect } = useDisconnect();
-  const { switchChain } = useSwitchChain();
+  const { isConnected, chain } = useAccount();
+  const { switchChain }        = useSwitchChain();
+  const { disconnect }         = useDisconnect();
 
-  /* is the user on the right chain? */
-  const onUmiDevnet = isConnected && chain?.id === umiDevnet.id;
+  // supported if on Umi Devnet OR on Local EVM
+  const onSupported =
+    isConnected &&
+    (chain?.id === umiDevnet.id || chain?.id === localEvm.id);
 
-  React.useEffect(() => {
-    if (isConnected && !onUmiDevnet && switchChain) {
+  // if they connect to anything else, send them to Devnet
+  useEffect(() => {
+    if (isConnected && !onSupported && switchChain) {
       switchChain({ chainId: umiDevnet.id });
     }
-  }, [isConnected, onUmiDevnet, switchChain]);
+  }, [isConnected, onSupported, switchChain]);
 
-  React.useEffect(() => {
-    if (isConnected && !onUmiDevnet) {
+  // if still not on supported chain, disconnect
+  useEffect(() => {
+    if (isConnected && !onSupported) {
       disconnect();
     }
-  }, [isConnected, onUmiDevnet, disconnect]);
+  }, [isConnected, onSupported, disconnect]);
 
-  return !onUmiDevnet ? (
-    <ConnectButton chainStatus="none" showBalance={false} />
-  ) : (
+  return onSupported ? (
     <ConnectButton chainStatus="full" showBalance={true} />
+  ) : (
+    <ConnectButton chainStatus="none" showBalance={false} />
   );
 }
