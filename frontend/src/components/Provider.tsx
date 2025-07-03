@@ -1,19 +1,21 @@
 // src/components/Provider.tsx
 "use client";
 
-import { createConfig, http, WagmiProvider } from 'wagmi';
-import { injected } from '@wagmi/connectors';              
-import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { umiDevnet } from '@/lib/chains';                 
+import { createConfig, WagmiProvider, http } from "wagmi";
+import { injected } from "@wagmi/connectors";
+import { RainbowKitProvider, darkTheme, getDefaultConfig, getDefaultWallets } from "@rainbow-me/rainbowkit";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { umiDevnet, localEvm } from "@/lib/customConfig";
 
-/** wagmi config */
-const config = createConfig({
-  chains: [umiDevnet],                                     
-  transports: {                                            
-    [umiDevnet.id]: http('https://devnet.moved.network'),
-  },
-  connectors: [injected()],                                
+const { wallets } = getDefaultWallets();
+
+export const wagmiConfig = getDefaultConfig({
+  appName: "Umi Developer Toolkit",
+  projectId: "your-project-id", // Replace with your actual project ID
+  chains: [
+    umiDevnet,
+    localEvm
+  ],
   ssr: true,
 });
 
@@ -21,13 +23,12 @@ export const queryClient = new QueryClient();
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <WagmiProvider config={config}>
+    <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider
-          initialChain={umiDevnet}
           theme={darkTheme({
-            accentColor: '#00ff98',
-            accentColorForeground: 'black',
+            accentColor: "#00ff98",
+            accentColorForeground: "black",
           })}
         >
           {children}
