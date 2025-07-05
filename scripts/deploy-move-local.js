@@ -4,16 +4,20 @@ const path = require("path");
 
 async function main() {
   const pkgDir = path.resolve(__dirname, "../contracts/move");
+  console.log("📦 Publishing Move module (local profile)…");
 
-  console.log("Publishing Move module to local Move testnet...");
-  // Assuming you have Counter named-address in Move.toml
-  // and `aptos` CLI in your PATH
   execSync(
-    `aptos move publish --package-dir ${pkgDir} --named-addresses Counter=0x1 --assume-yes`,
+    [
+      "aptos move publish",
+      `--package-dir ${pkgDir}`,
+      "--profile local",         // ← use the local profile
+      "--dev",                   // enables [dev-addresses]
+      "--assume-yes"
+    ].join(" "),
     { stdio: "inherit" }
   );
 
-  console.log("✅ Move module published locally under address 0x1::Counter");
+  console.log("✅ Move module published on localnet");
 }
 
 main();

@@ -25,7 +25,7 @@ async function main() {
   console.log("✅ EVM Counter deployed at:", address);
 
   // 5. Persist address so the front-end can auto-load it
-  const outfile = path.resolve(__dirname, "../cache-evm/local-counter.json");
+  const outfile = path.resolve(__dirname, "../cache/local-counter.json");
   fs.mkdirSync(path.dirname(outfile), { recursive: true });
   fs.writeFileSync(outfile, JSON.stringify({ address }, null, 2));
   console.log("✨ Saved address to", outfile);

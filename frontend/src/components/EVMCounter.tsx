@@ -20,7 +20,7 @@ import {
   getAccount, getEvmFunction, publicClient, walletClient,
 } from "@/lib/sol-config";
 import { hexToBytes } from 'viem';
-import localJson from "@/../../cache-evm/local-counter.json" assert { type: "json" };
+import localJson from "@/../../cache/local-counter.json" assert { type: "json" };
 
 
 export default function EVMCounter() {

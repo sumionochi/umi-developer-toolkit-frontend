@@ -46,6 +46,20 @@ const Counters = (props: Props) => {
   const allMoveStepsComplete = moveStepsCompleted === totalMoveSteps
   const allEvmStepsComplete = evmStepsCompleted === totalEvmSteps
 
+  const allMoveSelected = moveStepsCompleted === totalMoveSteps;
+const allEvmSelected  = evmStepsCompleted  === totalEvmSteps;
+
+// --- new toggle handlers ---
+const toggleAllMove = () =>
+  setMoveSteps((prev) =>
+    Object.fromEntries(Object.keys(prev).map((k) => [k, !allMoveSelected])) as typeof prev
+  );
+
+const toggleAllEvm = () =>
+  setEvmSteps((prev) =>
+    Object.fromEntries(Object.keys(prev).map((k) => [k, !allEvmSelected])) as typeof prev
+  );
+
   return (
     <div className="min-h-screen bg-white dark:bg-black">
       <Header />
@@ -64,7 +78,7 @@ const Counters = (props: Props) => {
           {/* Move Counter Section */}
           <div className="space-y-4 sm:space-y-6">
             <Card className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700">
-              <CardHeader className="p-3 sm:p-6">
+              <div className="p-6 pb-0 flex gap-2 flex-col">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
                   <CardTitle className="text-black dark:text-white flex items-center space-x-2 text-lg sm:text-xl">
                     <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary/10 rounded-lg flex items-center justify-center">
@@ -72,14 +86,27 @@ const Counters = (props: Props) => {
                     </div>
                     <span>Move Counter Setup</span>
                   </CardTitle>
-                  <Badge variant={allMoveStepsComplete ? "default" : "secondary"} className="text-xs">
-                    {moveStepsCompleted}/{totalMoveSteps} Complete
-                  </Badge>
+                  <div className="flex items-center flex-row gap-">
+                    <Badge className="flex bg-secondary flew-row gap-2 items-center">
+                      <Checkbox
+                        checked={allMoveSelected}
+                        onCheckedChange={toggleAllMove}
+                        className="cursor-pointer flex-shrink-0"
+                      />
+                      <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-purple-500 flex-shrink-0" />
+                      <span className=" font-medium text-black dark:text-white text-xs">
+                        Select all
+                      </span>
+                    </Badge>
+                    <Badge variant={allMoveStepsComplete ? "default" : "secondary"} className="text-xs">
+                      {moveStepsCompleted}/{totalMoveSteps} Complete
+                    </Badge>
+                  </div>
                 </div>
                 <CardDescription className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm">
                   Follow these steps to deploy and use the Move smart contract
                 </CardDescription>
-              </CardHeader>
+              </div>
               <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-6 pt-0">
                 {/* Step 0.1 */}
                 <div className="flex items-start space-x-2 sm:space-x-3">
@@ -247,22 +274,34 @@ const Counters = (props: Props) => {
           {/* EVM Counter Section */}
           <div className="space-y-4 sm:space-y-6">
             <Card className="bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700">
-              <CardHeader className="p-3 sm:p-6">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+              <div className="p-6 pb-0 flex gap-2 flex-col">                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
                   <CardTitle className="text-black dark:text-white flex items-center space-x-2 text-lg sm:text-xl">
                     <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary/10 rounded-lg flex items-center justify-center">
                       <span className="text-white font-bold text-xs sm:text-sm">⚙️</span>
                     </div>
                     <span>EVM Counter Setup</span>
                   </CardTitle>
-                  <Badge variant={allEvmStepsComplete ? "default" : "secondary"} className="text-xs">
-                    {evmStepsCompleted}/{totalEvmSteps} Complete
-                  </Badge>
+                  <div className="flex items-center flex-row gap-2">
+                    <Badge className="flex bg-secondary flew-row gap-2 items-center">
+                      <Checkbox
+                        checked={allEvmSelected}
+                        onCheckedChange={toggleAllEvm}
+                        className="cursor-pointer flex-shrink-0"
+                      />
+                      <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-purple-500 flex-shrink-0" />
+                      <span className=" font-medium text-black dark:text-white text-xs">
+                        Select all
+                      </span>
+                    </Badge>
+                    <Badge variant={allEvmStepsComplete ? "default" : "secondary"} className="text-xs">
+                      {evmStepsCompleted}/{totalEvmSteps} Complete
+                    </Badge>
+                  </div>
                 </div>
                 <CardDescription className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm">
                   Follow these steps to deploy and use the EVM smart contract
                 </CardDescription>
-              </CardHeader>
+              </div>
               <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-6 pt-0">
                 {/* Similar structure for EVM steps with mobile responsive classes */}
                 {/* Step 0.1 */}
