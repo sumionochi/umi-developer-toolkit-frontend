@@ -6,9 +6,6 @@ authors = []
 [addresses]
 example = "0xb2B41fDF9f1d687b4Aae21D38ad58D551dc62b18"
 
-[dev-addresses]
-example = "_local"
-
 [dependencies.AptosFramework]
 git    = "https://github.com/aptos-labs/aptos-framework.git"
 rev    = "aptos-release-v1.27"

@@ -27,7 +27,7 @@ export default function EVMCounter() {
   const chainId = useChainId();
   const chain = chainId === localEvm.id ? localEvm : umiDevnet;
 
-  const [addr, setAddr] = useState(localJson.address || "");
+  const [addr, setAddr] = useState("");
   const [value, setValue] = useState<number>();
   const [connected, setConnected] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -87,31 +87,34 @@ export default function EVMCounter() {
     try {
       setBusy(true);
       setError("");
-  
-      // build calldata
+
+      // 1. Build calldata (already works)
       const { to, data } = await getEvmFunction(
         "increment",
         addr as `0x${string}`,
-        chain,
+        chain
       );
-  
-      const acct = await getAccount();          // 0x… address
-  
-      // ✨ fetch the on-chain nonce
-      const currentNonce = await publicClient(chain).getTransactionCount({
+
+      // 2. Active wallet address
+      const acct = await getAccount();
+      console.log("[EVMCounter][increment] wallet account:", acct);
+
+      // 3. Chain-side nonce (no wallet cache)
+      const nonce = await publicClient(chain).getTransactionCount({
         address: acct,
       });
-      console.log("[EVMCounter][increment] using nonce:", currentNonce);
-  
-      // send tx with explicit nonce
+      console.log("[EVMCounter][increment] using nonce:", nonce);
+
+      // 4. Send tx with explicit nonce
       const hash = await walletClient(chain).sendTransaction({
         account: acct,
         to,
         data,
-        nonce: currentNonce,
+        nonce, // ← keeps Hardhat automine happy
       });
       console.log("[EVMCounter][increment] tx hash:", hash);
-  
+
+      // 5. Wait & refresh UI
       await publicClient(chain).waitForTransactionReceipt({ hash });
       await refresh();
     } catch (err) {
@@ -120,7 +123,7 @@ export default function EVMCounter() {
     } finally {
       setBusy(false);
     }
-  };  
+  };
 
   const copyAddress = () => {
     console.log("[EVMCounter] copy address:", addr);
