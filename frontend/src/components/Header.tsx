@@ -16,10 +16,10 @@ const Header = (props: Props) => {
                 </span>
             </div>
         </Link>
-    <div className="flex items-center space-x-4">
-        <ThemeToggle />
-        <WalletControls />
-    </div>
+        <div className="flex items-center space-x-4">
+            <ThemeToggle />
+            <WalletControls />
+        </div>
     </header>
   )
 }
