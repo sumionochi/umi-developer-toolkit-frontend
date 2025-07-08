@@ -1,58 +1,43 @@
 "use client"
 
-import {
-  Folder,
-  Forward,
-  MoreHorizontal,
-  Trash2,
-  type LucideIcon,
-} from "lucide-react"
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import type { LucideIcon } from "lucide-react"
 import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar"
+import type { Tab } from "@/app/ide/page"
 
 export function NavProjects({
   projects,
+  onTabSelect,
+  active,
 }: {
-  projects: {
-    name: string
-    url: string
-    icon: LucideIcon
-  }[]
+  projects: { name: string; icon: LucideIcon; tab: Tab }[]
+  onTabSelect?: (t: Tab) => void
+  active?: Tab
 }) {
-  const { isMobile } = useSidebar()
-
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+    <SidebarGroup>
       <SidebarGroupLabel>Features</SidebarGroupLabel>
+
       <SidebarMenu>
-        {projects.map((item) => (
-          <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton asChild>
-              <a href={item.url}>
-                <item.icon />
-                <span>{item.name}</span>
-              </a>
+        {projects.map((p) => (
+          <SidebarMenuItem
+            key={p.tab}
+            data-active={p.tab === active}
+          >
+            <SidebarMenuButton
+              className="w-full cursor-pointer"
+              onClick={() => onTabSelect?.(p.tab)}
+            >
+              <p.icon />
+              <span>{p.name}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}
-        <SidebarMenuItem>
-          
-        </SidebarMenuItem>
       </SidebarMenu>
     </SidebarGroup>
   )

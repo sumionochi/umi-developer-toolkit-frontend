@@ -1,7 +1,5 @@
 // src/app/page.tsx
 "use client";
-import MoveCounter from '@/components/MoveCounter';
-import EVMCounter  from '@/components/EVMCounter';
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -10,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { ThemeToggle } from "@/components/ui/theme-toggle"
 import {
     ArrowRight,
     BookOpen,
@@ -18,9 +15,6 @@ import {
     Compass,
   } from "lucide-react"
 import Link from "next/link"
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { queryClient } from "@/components/Provider";
-import { WalletControls } from '@/components/WalletControl';
 import { useAccount } from "wagmi";
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
@@ -43,7 +37,7 @@ export default function Home() {
 
   return (
     <SidebarProvider>
-      <AppSidebar collapsible='offcanvas'/>
+      <AppSidebar collapsible='offcanvas' onTabSelect={(t) => Router.push("/ide")}/>
       <SidebarInset>
         <div className="min-h-screen bg-white dark:bg-black relative">
           {/* Header */}

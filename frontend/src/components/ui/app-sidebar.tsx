@@ -1,27 +1,13 @@
 "use client"
 
-import * as React from "react"
 import {
   AlignLeft,
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
   GitFork,
   Hammer,
-  Map,
-  PieChart,
-  Settings2,
-  Sparkles,
-  SquareTerminal,
   WandSparkles,
+  type LucideIcon,
 } from "lucide-react"
-
-import { NavMain } from "@/components/ui/nav-main"
 import { NavProjects } from "@/components/ui/nav-projects"
-import { NavUser } from "@/components/ui/nav-user"
 import { TeamSwitcher } from "@/components/ui/team-switcher"
 import {
   Sidebar,
@@ -32,46 +18,49 @@ import {
 } from "@/components/ui/sidebar"
 import { Button } from "./button"
 import Link from "next/link"
+import type { Tab } from "@/app/ide/page"
 
-const data = {
-  teams: [
-    {
-      name: "UmiIDE",
-      logo: AlignLeft,
-      plan: "Goal: AI-powered online editor that can compile, test, and deploy both Move and Solidity code to Umi.",
-    },
-  ],
-  projects: [
-    {
-      name: "Generate Contracts",
-      url: "#",
-      icon: WandSparkles,
-    },
-    {
-      name: "Compile Contracts",
-      url: "#",
-      icon: Hammer,
-    },
-    {
-      name: "Deploy Contracts",
-      url: "#",
-      icon: GitFork,
-    },
-  ],
-}
+/* ─── static data ──────────────────────────────────────────────── */
+const teams = [
+  {
+    name: "UmiIDE",
+    logo: AlignLeft,
+    plan: "Goal: AI-powered editor for Move & Solidity on Umi",
+  },
+]
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+const projects: { name: string; icon: LucideIcon; tab: Tab }[] = [
+  { name: "Generate Contracts", icon: WandSparkles, tab: "generate" },
+  { name: "Compile Contracts",  icon: Hammer,       tab: "compile"  },
+  { name: "Deploy Contracts",   icon: GitFork,      tab: "deploy"   },
+]
+
+/* ─── sidebar component ────────────────────────────────────────── */
+export function AppSidebar({
+  onTabSelect,
+  activeTab,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & {
+  onTabSelect?: (t: Tab) => void
+  activeTab?: Tab
+}) {
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader className="flex flex-col items-start justify-items-start gap-2">
-        <TeamSwitcher teams={data.teams} />
+      <SidebarHeader className="flex flex-col items-start gap-2">
+        <TeamSwitcher teams={teams} />
       </SidebarHeader>
+
       <SidebarContent>
-        <NavProjects projects={data.projects} />
+        <NavProjects
+          projects={projects}
+          onTabSelect={onTabSelect}
+          active={activeTab}
+        />
       </SidebarContent>
+
       <SidebarFooter className="w-full">
-        <Link className="w-full" href="#">
-          <Button className="w-full">Settings</Button>
+        <Link href="#" className="w-full p-2 cursor-pointer">
+          <Button onClick={() => onTabSelect?.("settings")} className="w-full cursor-pointer">Settings</Button>
         </Link>
       </SidebarFooter>
       <SidebarRail />
