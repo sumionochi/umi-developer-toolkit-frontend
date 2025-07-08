@@ -7,6 +7,7 @@ import { Providers } from "@/components/Provider";
 import '@rainbow-me/rainbowkit/styles.css';
 import { Suspense } from 'react';
 import LoadingComponent from '@/components/LoadingComponent';
+
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",

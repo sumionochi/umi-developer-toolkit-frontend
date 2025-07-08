@@ -93,7 +93,7 @@ const Counters = (props: Props) => {
             Smart Contract Counters
           </h1>
           <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base lg:text-lg px-2">
-            Deploy and interact with Move and EVM smart contracts on Umi
+            Deploy and interact with Move and EVM smart contracts on {devOrLocal? "Umi" : "Locally"}
           </p>
         </div>
 
