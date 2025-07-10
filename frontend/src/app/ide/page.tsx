@@ -8,103 +8,99 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/ui/app-sidebar"
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable"
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from "@/components/ui/resizable"
 import { Button } from "@/components/ui/button"
 import CodeEditor from "@/components/CodeEditor"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
-import { Loader2 } from "lucide-react"
+import { Loader2, Sparkles } from "lucide-react"
 import Header from "@/components/Header"
+
+import { useAiGenerate } from "@/hooks/useAiGenerate"
+import { useAiDoubt } from "@/hooks/useAiDoubt"
 
 export type Tab = "generate" | "compile" | "deploy" | "settings"
 
 export default function IDE() {
-  // ui state
+  // ─────────────────────────────────── UI Tabs
   const [tab, setTab] = useState<Tab>("generate")
-  const [lang, setLang] = useState<"solidity" | "move">("solidity")
-  const [prompt, setPrompt] = useState("")
-  const [code, setCode]   = useState("// write your contract here …")
-  const [busy, setBusy]   = useState(false)
+
+  // ─────────────────────────────────── Shared editor state
+  const [code, setCode] = useState("// write your contract here …")
+  const [genLang, setGenLang] = useState<"solidity" | "move">("solidity")
+  const [faqLang, setFaqLang] = useState<"solidity" | "move">("move")
+
+  // ─────────────────────────────────── Compile placeholder
+  const [compileBusy, setCompileBusy] = useState(false)
   const [compileOut, setCompileOut] = useState("")
 
-  // —— Ask-doubts ————————————————————————————
-  const [question, setQuestion]   = useState("")
-  const [answer,   setAnswer]     = useState("")
-  const [askBusy,  setAskBusy]    = useState(false)
+  // ─────────────────────────────────── Generate hook
+  const {
+    input: genInput,
+    handleInputChange: handleGenInput,
+    submitMessage: doGenerate,
+    status: genStatus,
+  } = useAiGenerate(genLang, setCode)
 
-  // ─── state ───────────────────────────────────────────────────────
-  const [genLang, setGenLang]   = useState<"solidity" | "move">("solidity") // ← for Generate
-  const [faqLang, setFaqLang]   = useState<"solidity"    | "move">("move") // for Ask-doubts
-
+  // ─────────────────────────────────── Doubt hook
+  const {
+    input: question,
+    handleInputChange: handleQuestion,
+    submitMessage: askDoubt,
+    messages: doubtMsgs,
+    status: askStatus,
+  } = useAiDoubt(faqLang)
 
   /* — helpers ——————————————————————————— */
-  const generateCode = async () => {
-    setBusy(true)
-    setCompileOut("")
-    try {
-      const r = await fetch("/api/ai", {
-        method: "POST",
-        body: JSON.stringify({ lang: genLang, prompt }),
-        headers: { "Content-Type": "application/json" },
-      })
-      const { result } = await r.json()
-      setCode(result)
-    } catch (e) {
-      console.error(e)
-    } finally {
-      setBusy(false)
-    }
-  }
-
   const compileCode = () => {
-    setBusy(true)
+    setCompileBusy(true)
     setCompileOut("")
-    // ⬇︎ placeholder – replace with real solc / move compile
+    // ⬇︎ placeholder – wire Solc / Move WASM here
     setTimeout(() => {
       setCompileOut("✅ compiled successfully (fake output)")
-      setBusy(false)
+      setCompileBusy(false)
     }, 800)
-  }
-
-  const askDoubt = async () => {
-    if (!question.trim()) return
-    setAskBusy(true)
-    setAnswer("")
-    try {
-      const r = await fetch("/api/ai/faq", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lang: faqLang, question }),
-      })
-      const { result } = await r.json()
-      setAnswer(result)          // full text return; swap for stream if you like
-    } catch (err) {
-      console.error(err)
-      setAnswer("❌ Failed to fetch answer")
-    } finally {
-      setAskBusy(false)
-    }
   }
 
   return (
     <SidebarProvider>
-      <AppSidebar activeTab={tab} onTabSelect={setTab} collapsible="offcanvas" />
+      <AppSidebar
+        activeTab={tab}
+        onTabSelect={setTab}
+        collapsible="offcanvas"
+      />
       <SidebarInset className="min-h-screen bg-background flex flex-col">
         <SidebarTrigger className="-ml-1 absolute top-0 left-0 cursor-pointer" />
-        <Header/>
+        <Header />
+
         {/* ------------- SPLIT PANE ------------- */}
-        <ResizablePanelGroup direction="horizontal" className="min-h-screen border-2">
+        <ResizablePanelGroup
+          direction="horizontal"
+          className="min-h-screen border-2"
+        >
           {/* LEFT TOOL PANE */}
-          <ResizablePanel minSize={22} defaultSize={28} className="border-r">
-            <div className="h-full overflow-y-auto p-4 space-y-6 text-sm">
+          <ResizablePanel
+            minSize={22}
+            defaultSize={28}
+            className="border-r overflow-y-auto"
+          >
+            <div className="p-4 space-y-6 text-sm">
+              {/* ─────────────────── Generate TAB ─────────────────── */}
               {tab === "generate" && (
                 <>
-                  <h1 className="font-bold text-start text-xl">AI Assistant</h1>   
+                  <h1 className="font-bold text-xl">AI Assistant</h1>
+
+                  {/* — Generate card — */}
                   <div className="flex flex-col gap-4">
-                    <p className="font-semibold">Generate Contract with AI</p>
-                    {/* ── Generate card language toggle ── */}
+                    <p className="font-semibold">Generate contract with AI</p>
+
+                    {/* language toggle */}
                     <div className="flex gap-2">
-                      {(["solidity","move"] as const).map(l => (
+                      {(["solidity", "move"] as const).map((l) => (
                         <Button
                           key={l}
                           variant={l === genLang ? "default" : "outline"}
@@ -116,19 +112,35 @@ export default function IDE() {
                         </Button>
                       ))}
                     </div>
+
                     <Textarea
-                      value={prompt}
-                      onChange={e => setPrompt(e.target.value)}
+                      value={genInput}
+                      onChange={handleGenInput}
                       placeholder="Describe the contract you need"
                       className="h-32"
                     />
+
+                    <Button
+                      onClick={() => doGenerate()}
+                      disabled={genStatus === "in_progress"}
+                      className="w-full gap-1"
+                    >
+                      {genStatus === "in_progress" ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Sparkles className="h-4 w-4" />
+                      )}
+                      Generate
+                    </Button>
                   </div>
+
+                  {/* — Doubt card — */}
                   <div className="flex flex-col gap-4 mt-6">
                     <p className="font-semibold">Ask doubts</p>
 
                     {/* language toggle */}
                     <div className="flex gap-2">
-                      {(["solidity","move"] as const).map(t => (
+                      {(["solidity", "move"] as const).map((t) => (
                         <Button
                           key={t}
                           variant={t === faqLang ? "default" : "outline"}
@@ -141,34 +153,58 @@ export default function IDE() {
                       ))}
                     </div>
 
-                    {/* question box */}
                     <Textarea
                       value={question}
-                      onChange={e => setQuestion(e.target.value)}
-                      placeholder={`Ask doubts about ${faqLang === "move" ? "Move" : "Solidity"}…`}
+                      onChange={handleQuestion}
+                      placeholder={`Ask about ${
+                        faqLang === "move" ? "Move/Umi" : "Solidity"
+                      }…`}
                       className="h-24"
                     />
 
-                    {/* submit */}
-                    <Button onClick={askDoubt} disabled={askBusy} className="w-full">
-                      {askBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Ask"}
+                    <Button
+                      onClick={() => askDoubt()}
+                      disabled={askStatus === "in_progress"}
+                      className="w-full"
+                    >
+                      {askStatus === "in_progress" ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        "Ask"
+                      )}
                     </Button>
 
-                    {/* answer display */}
-                    {answer && (
-                      <pre className="bg-muted/50 mt-2 p-3 rounded text-xs whitespace-pre-wrap">
-                        {answer}
-                      </pre>
-                    )}
+                    {/* answers */}
+                    <div className="space-y-2">
+                      {doubtMsgs
+                        .filter((m) => m.role === "assistant")
+                        .map((m) => (
+                          <pre
+                            key={m.id}
+                            className="bg-muted/50 p-2 rounded text-xs whitespace-pre-wrap"
+                          >
+                            {m.content}
+                          </pre>
+                        ))}
+                    </div>
                   </div>
                 </>
               )}
 
+              {/* ─────────────────── Compile TAB ─────────────────── */}
               {tab === "compile" && (
                 <>
-                  <h3 className="font-semibold">Compile</h3>
-                  <Button onClick={compileCode} disabled={busy} className="w-full">
-                    {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Run compiler"}
+                  <h3 className="font-semibold mb-2">Compile</h3>
+                  <Button
+                    onClick={compileCode}
+                    disabled={compileBusy}
+                    className="w-full"
+                  >
+                    {compileBusy ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      "Run compiler"
+                    )}
                   </Button>
                   {compileOut && (
                     <pre className="bg-muted p-2 mt-4 rounded text-xs whitespace-pre-wrap">
@@ -178,21 +214,25 @@ export default function IDE() {
                 </>
               )}
 
+              {/* ─────────────────── Deploy TAB ─────────────────── */}
               {tab === "deploy" && (
                 <>
-                  <h3 className="font-semibold">Deploy</h3>
-                  {/* place-holders; wire to your viem helpers later */}
+                  <h3 className="font-semibold mb-2">Deploy</h3>
+                  {/* place-holders; wire helpers later */}
                   <Input placeholder="Contract name" />
                   <Button className="w-full mt-2">Deploy to Devnet</Button>
                 </>
               )}
 
+              {/* ─────────────────── Settings TAB ─────────────────── */}
               {tab === "settings" && (
                 <>
-                  <h3 className="font-semibold">Settings</h3>
+                  <h3 className="font-semibold mb-2">Settings</h3>
                   <Input
                     placeholder="OpenAI API key"
-                    onChange={e => localStorage.setItem("openai", e.target.value)}
+                    onChange={(e) =>
+                      localStorage.setItem("openai", e.target.value)
+                    }
                   />
                 </>
               )}
@@ -203,7 +243,11 @@ export default function IDE() {
 
           {/* RIGHT CODE EDITOR PANE */}
           <ResizablePanel minSize={40}>
-            <CodeEditor language={genLang === "move" ? "move" : "solidity"} code={code} onChange={setCode} />
+            <CodeEditor
+              language={genLang === "move" ? "move" : "solidity"}
+              code={code}
+              onChange={setCode}
+            />
           </ResizablePanel>
         </ResizablePanelGroup>
       </SidebarInset>
