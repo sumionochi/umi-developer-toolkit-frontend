@@ -1,7 +1,7 @@
-// src/app/ide/page.tsx
 "use client"
 
 import { useState } from "react"
+import dynamic from "next/dynamic"
 import {
   SidebarProvider,
   SidebarInset,
@@ -14,7 +14,6 @@ import {
   ResizableHandle,
 } from "@/components/ui/resizable"
 import { Button } from "@/components/ui/button"
-import CodeEditor from "@/components/CodeEditor"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Loader2, Sparkles } from "lucide-react"
@@ -22,6 +21,12 @@ import Header from "@/components/Header"
 
 import { useAiGenerate } from "@/hooks/useAiGenerate"
 import { useAiDoubt } from "@/hooks/useAiDoubt"
+
+// Dynamically import the CodeEditor with SSR turned off
+const CodeEditor = dynamic(() => import("@/components/CodeEditor"), {
+  ssr: false,
+  loading: () => <div className="p-4 bg-[#1e1e1e] text-gray-400">Loading editor...</div>,
+})
 
 export type Tab = "generate" | "compile" | "deploy" | "settings"
 
@@ -40,11 +45,22 @@ export default function IDE() {
 
   // ─────────────────────────────────── Generate hook
   const {
-    input: genInput,
-    handleInputChange: handleGenInput,
-    submitMessage: doGenerate,
-    status: genStatus,
-  } = useAiGenerate(genLang, setCode)
+      input: genInput,
+      handleInputChange: handleGenInput,
+      submitMessage: doGenerate,
+      status: genStatus,
+    } = useAiGenerate(
+      genLang,
+      // Callback for real-time streaming updates
+      (streamingCode) => {
+        setCode(streamingCode);
+      },
+      // Callback for when generation is complete
+      (finalCode, compileMsg) => {
+        setCode(finalCode);          // Ensure final code is set
+        setCompileOut(compileMsg);   // Show compile message instantly
+      }
+    )
 
   // ─────────────────────────────────── Doubt hook
   const {
@@ -211,6 +227,11 @@ export default function IDE() {
                       {compileOut}
                     </pre>
                   )}
+                  {!compileOut && (
+                    <p className="text-xs text-gray-500">
+                      open console ↗ to watch generate → compile logs
+                    </p>
+                  )}
                 </>
               )}
 
@@ -242,7 +263,7 @@ export default function IDE() {
           <ResizableHandle withHandle />
 
           {/* RIGHT CODE EDITOR PANE */}
-          <ResizablePanel minSize={40}>
+          <ResizablePanel minSize={40} className="flex flex-col">
             <CodeEditor
               language={genLang === "move" ? "move" : "solidity"}
               code={code}
