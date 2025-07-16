@@ -29,7 +29,7 @@ export default function CodeEditor({
   return (
     <div className="flex-1">
       <Editor
-      height="90.5%"
+      height="100%"
       theme={theme === "dark" ? "vs-dark" : "vs-light"}
       language={language}
       value={code}

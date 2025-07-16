@@ -1,75 +1,49 @@
 import { useAssistant } from "ai/react";
 import { useEffect, useRef } from "react";
-import {
-  unwrapSolidity,
-  compileSolidity,
-  stripFences,
-} from "@/lib/sol-compile";
+import { stripFences } from "@/lib/sol-compile";
 
-/**
- * Custom hook for generating smart contracts with AI.
- *
- * @param lang - The smart contract language ('solidity' or 'move').
- * @param onStreamUpdate - Callback function that receives the streaming code in real-time.
- * @param onDone - Callback function executed when code generation is complete, providing the final source and a compilation message.
- */
+/* ------------------------------------------------------------------ */
+/*  Hook streams the assistant code into the editor – no compiling    */
+/* ------------------------------------------------------------------ */
+
 export function useAiGenerate(
   lang: "move" | "solidity",
-  onStreamUpdate: (code: string) => void,
-  onDone: (source: string, compiledMsg: string) => void
+  onStream: (code: string) => void,
+  onDone: (finalSource: string) => void // <── only source now
 ) {
-  // 1. Restore previous OpenAI thread to maintain conversation context.
+  /* 1‒ keep conversation thread */
   const storageKey = `umi_thread_gen_${lang}`;
   const threadId =
     typeof window !== "undefined" ? localStorage.getItem(storageKey) : null;
 
   const { input, handleInputChange, submitMessage, messages, status } =
-    useAssistant({
-      api: "/api/generate",
-      body: { lang, threadId },
-    });
+    useAssistant({ api: "/api/generate", body: { lang, threadId } });
 
-  // 2. Remember the thread-id once the first assistant message returns.
+  /* 2‒ store the new thread-id once */
   useEffect(() => {
     const meta = messages.find((m) => (m as any).threadId);
     if (meta) localStorage.setItem(storageKey, (meta as any).threadId);
   }, [messages, storageKey]);
 
-  // 3. (NEW) Stream the assistant's response directly to the editor.
+  /* 3‒ stream the partial answer straight into the editor */
   useEffect(() => {
-    const lastMessage = messages.at(-1);
-    // As the assistant's message content updates (streams),
-    // call the onStreamUpdate callback to update the UI in real-time.
-    if (lastMessage && lastMessage.role === "assistant") {
-      onStreamUpdate(stripFences(lastMessage.content));
+    const last = messages.at(-1);
+    if (last?.role === "assistant") {
+      onStream(stripFences(last.content));
     }
-  }, [messages, onStreamUpdate]);
+  }, [messages, onStream]);
 
-  // 4. (MODIFIED) Compile only when the assistant is *finished* sending.
-  // We now use the `status` field for a more reliable "done" signal.
-  const prevStatus = useRef(status);
-
+  /* 4‒ fire onDone only when streaming finishes – *no compile* */
+  const prev = useRef(status);
   useEffect(() => {
-    // If the status was 'in_progress' and has now changed, we know generation is complete.
-    if (prevStatus.current === "in_progress" && status !== "in_progress") {
-      const lastMessage = messages.at(-1);
-      if (lastMessage && lastMessage.role === "assistant") {
-        const finalSource = stripFences(lastMessage.content);
-        console.log("[Generate] Final source length:", finalSource.length);
-
-        if (lang === "solidity") {
-          compileSolidity(unwrapSolidity(finalSource))
-            .then((out) => onDone(finalSource, out))
-            .catch((e) => onDone(finalSource, `❌ ${e}`));
-        } else {
-          // For Move, provide a stub success message.
-          onDone(finalSource, "✅ compiled successfully (Move stub)");
-        }
+    if (prev.current === "in_progress" && status !== "in_progress") {
+      const last = messages.at(-1);
+      if (last?.role === "assistant") {
+        onDone(stripFences(last.content)); // <── just source
       }
     }
-    // Update the ref for the next render cycle.
-    prevStatus.current = status;
-  }, [status, messages, lang, onDone]);
+    prev.current = status;
+  }, [status, messages, onDone]);
 
   return { input, handleInputChange, submitMessage, status };
 }

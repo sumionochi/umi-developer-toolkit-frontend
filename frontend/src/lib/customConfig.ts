@@ -14,7 +14,7 @@ export const umiDevnet = defineChain({
   blockExplorers: {
     default: {
       name: "Umi Explorer",
-      url: "https://devnet.explorer.moved.network",
+      url: "https://devnet.explorer.uminetwork.com",
     },
   },
   testnet: true,

@@ -14,12 +14,6 @@ import {
 } from "viem";
 import { publicActionsL2, walletActionsL2 } from "viem/op-stack";
 
-declare global {
-  interface Window {
-    ethereum?: { request: (a: { method: string }) => Promise<any> };
-  }
-}
-
 /* ───────────────────────────── chain def ── */
 export const devnet = defineChain({
   id: 42069,
