@@ -19,7 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2, MessageCircleCode, Sparkles } from "lucide-react";
 import Header from "@/components/Header";
 
 import { useAiGenerate } from "@/hooks/useAiGenerate";
@@ -37,7 +37,10 @@ import { useAccount } from "wagmi";
 const CodeEditor = dynamic(() => import("@/components/CodeEditor"), {
   ssr: false,
   loading: () => (
-    <div className="p-4 bg-[#1e1e1e] text-gray-400">Loading editor…</div>
+    <div className="absolute inset-0 flex items-center justify-center bg-secondary">
+      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <span className="ml-2 text-muted-foreground text-2xl">Loading editor…</span>
+    </div>
   ),
 });
 
@@ -177,160 +180,147 @@ export default function IDE() {
               {/*  AI Generate TAB                                      */}
               {/* ===================================================== */}
               {tab === "generate" && (
-                <>
+                <div className="space-y-8">
+                  {/* Header */}
                   <h1 className="font-bold text-xl">AI Assistant</h1>
-
-                  {/* --- language toggle */}
-                  <div className="flex gap-2 mb-2">
-                    {(["solidity", "move"] as const).map((l) => (
-                      <Button
-                        key={l}
-                        variant={l === genLang ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setGenLang(l)}
-                        className="capitalize"
-                      >
-                        {l}
-                      </Button>
-                    ))}
-                  </div>
-
-                  {/* --- prompt box */}
-                  <Textarea
-                    value={genInput}
-                    onChange={handleGenInput}
-                    placeholder="Describe the contract you need…"
-                    className="h-32"
-                  />
-                  <Button
-                    onClick={() => doGenerate()}
-                    disabled={genStatus === "in_progress"}
-                    className="w-full gap-1"
-                  >
-                    {genStatus === "in_progress" ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Sparkles className="h-4 w-4" />
-                    )}
-                    Generate
-                  </Button>
-
-                  {/* --- Doubts */}
-                  <div className="mt-8 space-y-2">
-                    <p className="font-semibold">Ask doubts</p>
-                    <div className="flex gap-2">
-                      {(["solidity", "move"] as const).map((t) => (
-                        <Button
-                          key={t}
-                          variant={t === faqLang ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setFaqLang(t)}
-                          className="capitalize"
-                        >
-                          {t}
-                        </Button>
-                      ))}
+            
+                  {/* Generate Contract Section */}
+                  <div className="space-y-4">
+                    <div className="space-y-3">
+                      <p className="font-semibold">Generate Contract</p>
+                      <div className="flex gap-2">
+                        {(["solidity", "move"] as const).map((l) => (
+                          <Button
+                            key={l}
+                            variant={l === genLang ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setGenLang(l)}
+                            className="capitalize"
+                          >
+                            {l}
+                          </Button>
+                        ))}
+                      </div>
                     </div>
-
-                    <Textarea
-                      value={question}
-                      onChange={handleQuestion}
-                      placeholder={`Ask about ${
-                        faqLang === "move" ? "Move/Umi" : "Solidity"
-                      }…`}
-                      className="h-24"
-                    />
-                    <Button
-                      onClick={askDoubt}
-                      disabled={askStatus === "in_progress"}
-                      className="w-full"
-                    >
-                      {askStatus === "in_progress" ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        "Ask"
-                      )}
-                    </Button>
-
-                    {/* answers */}
-                    {doubtMsgs
-                      .filter((m) => m.role === "assistant")
-                      .map((m) => (
-                        <pre
-                          key={m.id}
-                          className="bg-muted/50 p-2 rounded text-xs whitespace-pre-wrap"
-                        >
-                          {m.content}
-                        </pre>
-                      ))}
+            
+                    <div className="space-y-3">
+                      <Textarea
+                        value={genInput}
+                        onChange={handleGenInput}
+                        placeholder="Describe the contract you need…"
+                        className="h-32"
+                      />
+                      <Button onClick={() => doGenerate()} disabled={genStatus === "in_progress"} className="w-full gap-2">
+                        {genStatus === "in_progress" ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Sparkles className="h-4 w-4" />
+                        )}
+                        Generate
+                      </Button>
+                    </div>
                   </div>
-                </>
+          
+                  {/* Ask Doubts Section */}
+                  <div className="space-y-4">
+                    <div className="space-y-3">
+                      <p className="font-semibold">Ask Doubts</p>
+                      <div className="flex gap-2">
+                        {(["solidity", "move"] as const).map((t) => (
+                          <Button
+                            key={t}
+                            variant={t === faqLang ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setFaqLang(t)}
+                            className="capitalize"
+                          >
+                            {t}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+            
+                    <div className="space-y-3">
+                      <Textarea
+                        value={question}
+                        onChange={handleQuestion}
+                        placeholder={`Ask about ${faqLang === "move" ? "Move/Umi" : "Solidity"}…`}
+                        className="h-24"
+                      />
+                      <Button onClick={askDoubt} disabled={askStatus === "in_progress"} className="w-full gap-2">
+                        {askStatus === "in_progress" ? <Loader2 className="h-4 w-4 animate-spin" /> : <div className="flex flex-row gap-2 items-center justify-center"><MessageCircleCode className="w-5 h-5"/> Ask</div>}
+                      </Button>
+                    </div>
+            
+                    {/* Answers */}
+                    {doubtMsgs.filter((m) => m.role === "assistant").length > 0 && (
+                      <div className="space-y-3">
+                        <p className="font-semibold text-sm text-muted-foreground">Answers</p>
+                        <div className="space-y-3">
+                          {doubtMsgs
+                            .filter((m) => m.role === "assistant")
+                            .map((m) => (
+                              <pre key={m.id} className="bg-muted/50 p-4 rounded-lg text-xs whitespace-pre-wrap border">
+                                {m.content}
+                              </pre>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               )}
 
-              {/* ===================================================== */}
+               {/* ===================================================== */}
               {/*  Compile TAB                                          */}
               {/* ===================================================== */}
               {tab === "compile" && (
-                <>
-                  <h3 className="font-semibold mb-2">Compile</h3>
+                <div className="space-y-4">
+                  <h3 className="font-semibold">Compile</h3>
 
-                  {/* --- Compile button */}
-                  <Button
-                    onClick={compileCode}
-                    disabled={compileBusy}
-                    className="w-full"
-                  >
-                    {compileBusy ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      "Run compiler"
-                    )}
+                  {/* Compile Button */}
+                  <Button onClick={compileCode} disabled={compileBusy} className="w-full">
+                    {compileBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Run compiler"}
                   </Button>
 
-                  {/* --- compiler output */}
-                  {compileOut ? (
-                    <pre className="bg-muted p-2 mt-4 rounded text-xs whitespace-pre-wrap">
-                      {compileOut}
-                    </pre>
-                  ) : (
-                    <p className="text-xs text-gray-500 mt-4">
-                      compile logs will appear here
-                    </p>
-                  )}
-                </>
+                  {/* Compiler Output */}
+                  <div className="space-y-2">
+                    {compileOut ? (
+                      <pre className="bg-muted p-3 rounded text-xs whitespace-pre-wrap">{compileOut}</pre>
+                    ) : (
+                      <p className="text-xs text-gray-500">compile logs will appear here</p>
+                    )}
+                  </div>
+
+                  {/* Coming Soon Notice */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                      <p className="text-sm font-medium text-blue-800">Automation Compile and Deploy for "Move Contracts" coming soon!</p>
+                    </div>
+                  </div>
+                </div>
               )}
 
               {/* ===================================================== */}
               {/*  Deploy TAB                                           */}
               {/* ===================================================== */}
-
               {tab === "deploy" && (
-                <>
-                  <h3 className="font-semibold mb-4">Deploy</h3>
+                <div className="space-y-4">
+                  <h3 className="font-semibold">Deploy</h3>
 
-                  {/* must have a compiled artefact first */}
-                  {!compiled && (
-                    <p className="text-xs text-gray-500">
-                      Compile a contract first ↗
-                    </p>
-                  )}
+                  {/* Must have compiled artifact first */}
+                  {!compiled && <p className="text-xs text-gray-500">Compile a contract first ↗</p>}
 
                   {compiled && (
                     <div className="space-y-3">
                       <p className="text-xs">
-                        <span className="font-medium">Contract:</span>{" "}
-                        {compiled.contractName}
+                        <span className="font-medium">Contract:</span> {compiled.contractName}
                       </p>
 
-                      {/* -------------------------------------------------- */}
-                      {/*  Deploy button – ALWAYS visible (except pending)   */}
-                      {/* -------------------------------------------------- */}
+                      {/* Deploy Button */}
                       {chain && (
-                        <Button
-                          onClick={deployCode}
-                          disabled={deployStatus === "pending"}
-                          className="w-full"
-                        >
+                        <Button onClick={deployCode} disabled={deployStatus === "pending"} className="w-full">
                           {deployStatus === "pending" ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -342,34 +332,39 @@ export default function IDE() {
                         </Button>
                       )}
 
-                      {/* -------------------------------------------------- */}
-                      {/*  Messages                                          */}
-                      {/* -------------------------------------------------- */}
-
-                      {deployTx && (
-                        <p className="text-xs break-all">
-                          <span className="font-medium">Tx&nbsp;Hash:</span> {deployTx}
-                        </p>
-                      )}
-
-                      {deployStatus === "success" && deployAddr && (
-                          <div className="text-xs break-all space-y-1">
-                          <p>✅ Deployed!</p>
-                          <p>
-                            <span className="font-medium">Address:</span> {deployAddr}
-                          </p>
-                          <p>
+                      {/* Messages */}
+                      <div className="space-y-2">
+                        {deployTx && (
+                          <p className="text-xs break-all">
                             <span className="font-medium">Tx&nbsp;Hash:</span> {deployTx}
                           </p>
-                        </div>
-                      )}
+                        )}
 
-                      {deployStatus === "error" && (
-                        <p className="text-xs text-red-500 break-all">{deployErr}</p>
-                      )}
+                        {deployStatus === "success" && deployAddr && (
+                          <div className="text-xs break-all space-y-1">
+                            <p>✅ Deployed!</p>
+                            <p>
+                              <span className="font-medium">Address:</span> {deployAddr}
+                            </p>
+                            <p>
+                              <span className="font-medium">Tx&nbsp;Hash:</span> {deployTx}
+                            </p>
+                          </div>
+                        )}
+
+                        {deployStatus === "error" && <p className="text-xs text-red-500 break-all">{deployErr}</p>}
+
+                        {/* Coming Soon Notice */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                          <div className="flex items-center space-x-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                            <p className="text-sm font-medium text-blue-800">Automation Compile and Deploy for "Move Contracts" coming soon!</p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   )}
-                </>
+                </div>
               )}
 
 

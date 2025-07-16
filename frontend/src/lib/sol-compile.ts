@@ -88,7 +88,7 @@ export async function deployToUmi(
   await window.ethereum.request({
     method: "wallet_requestPermissions",
     params: [{ eth_accounts: {} }],
-  }); /* :contentReference[oaicite:4]{index=4} */
+  });
 
   const [account] = (await wallet.request({
     method: "eth_requestAccounts",
@@ -104,7 +104,6 @@ export async function deployToUmi(
     try {
       await switchChain(wallet, { id: umiDevnet.id });
     } catch (err: any) {
-      /* :contentReference[oaicite:5]{index=5} */
       if (err?.code === 4902) {
         // unknown chain
         await addChain(wallet, { chain: umiDevnet });
