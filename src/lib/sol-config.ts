@@ -1,5 +1,5 @@
 // src/lib/sol-config.ts
-import CounterJson from "../../../artifacts/contractsevm/evm/Counterevm.sol/Counterevm.json" assert { type: "json" };
+import CounterJson from "../../artifacts/contractsevm/evm/Counterevm.sol/Counterevm.json" assert { type: "json" };
 import { BCS, getRustConfig } from "@benfen/bcs";
 import {
   createPublicClient,
