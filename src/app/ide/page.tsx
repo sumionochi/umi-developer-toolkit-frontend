@@ -366,22 +366,6 @@ export default function IDE() {
                   )}
                 </div>
               )}
-
-
-              {/* ===================================================== */}
-              {/*  Settings TAB                                         */}
-              {/* ===================================================== */}
-              {tab === "settings" && (
-                <>
-                  <h3 className="font-semibold mb-2">Settings</h3>
-                  <Input
-                    placeholder="OpenAI API key"
-                    onChange={(e) =>
-                      localStorage.setItem("openai", e.target.value)
-                    }
-                  />
-                </>
-              )}
             </div>
           </ResizablePanel>
 
