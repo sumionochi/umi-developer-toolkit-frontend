@@ -1,55 +1,55 @@
 {
-  "name": "create-umi-app",
-  "version": "1.0.4",
-  "bin": {
-    "create-umi-app": "bin/create-umi-app.js"
-  },
-  "description": "Instant Fullstack Scaffold where CLI generates fresh projects with Dual-VM Umi dApp support (Move + EVM) together with built-in MoveAI & SolidityAI browser IDE for opening the project in a browser, edit code, compile, and deploy",
-  "main": "index.js",
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "compile": "hardhat compile",
-    "deploy:evm": "hardhat run scripts/deploy-evm.js --network devnet",
-    "deploy:move": "hardhat run scripts/deploy-move.js --network devnet",
-    "deploy:all": "npm run deploy:evm && npm run deploy:move",
-    "test:move": "cd contracts/move && aptos move test",
-    "test:evm": "hardhat test",
-    "faucet": "node scripts/faucet.js",
-
-    "chain:evm": "hardhat node --hostname 0.0.0.0 --port 8545",
-    "chain:move": "aptos node run-localnet --test-dir aptos_data",
-    "chain:local": "concurrently \"npm:chain:evm\" \"npm:chain:move\"",
-
-    "deploy:evm:local": "hardhat run scripts/deploy-evm-local.js --network localhost",
-    "deploy:move:local": "aptos move publish --package-dir contracts/move --dev",
-
-    "dev:local": "npm run chain:local & npm run deploy:evm:local & npm run deploy:move:local"
-  },
-  "keywords": [
-    "umi",
-    "move",
-    "solidity",
-    "cli",
-    "scaffold",
-    "ide",
-    "instant"
-  ],
-  "author": "Aadtiya Srivastava <aadtiya.srivastava.connect@gmail.com>",
-  "license": "MIT",
-  "type": "commonjs",
-  "devDependencies": {
-    "@aptos-labs/ts-sdk": "^2.0.1",
-    "@benfen/bcs": "^0.1.0",
-    "@moved/hardhat-plugin": "^0.1.1",
-    "@nomicfoundation/hardhat-toolbox": "^6.0.0",
-    "concurrently": "^9.2.0",
-    "dotenv": "^16.5.0",
-    "hardhat": "^2.25.0"
+    "dev": "next dev",
+    "build": "next build --experimental-build-mode compile",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
+    "@aptos-labs/ts-sdk": "^2.0.1",
+    "@benfen/bcs": "^0.1.0",
+    "@monaco-editor/react": "^4.7.0",
     "@mysten/bcs": "^1.6.3",
-    "aptos": "^1.21.0",
-    "fs-extra": "^11.2.0",
-    "viem": "^2.31.4"
+    "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-checkbox": "^1.3.2",
+    "@radix-ui/react-collapsible": "^1.1.11",
+    "@radix-ui/react-dialog": "^1.1.14",
+    "@radix-ui/react-dropdown-menu": "^2.1.15",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-separator": "^1.1.7",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tooltip": "^1.2.7",
+    "@rainbow-me/rainbowkit": "^2.0.5",
+    "@tanstack/react-query": "^5.29.0",
+    "ai": "^3.0.24",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "ethers": "^6.14.4",
+    "lucide-react": "^0.525.0",
+    "model-context-protocol": "^1.0.2",
+    "monaco-editor": "^0.52.2",
+    "next": "15.3.4",
+    "next-themes": "^0.4.6",
+    "openai": "^4.38.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-resizable-panels": "^3.0.3",
+    "solc": "^0.8.25",
+    "tailwind-merge": "^3.3.1",
+    "viem": "^2.31.4",
+    "wagmi": "^2.5.19"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "pino-pretty": "^13.0.0",
+    "tailwindcss": "^4",
+    "tw-animate-css": "^1.3.4",
+    "typescript": "^5"
   }
 }
